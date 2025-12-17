@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ commit-branch ]
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -20,6 +20,16 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd ${{ secrets.VM_PATH }}
-          git pull origin main || git clone https://github.com/NNovikov0/ https://github.com/NNovikov0/github-actions-lab-MN.git .
+          
+          # Clone repo if it doesn't exist, otherwise pull latest
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/NNovikov0/github-actions-lab-MN.git .
+          else
+            git pull origin main
+          fi
+          
+          # Set correct permissions
           sudo chown -R ubuntu:www-data ${{ secrets.VM_PATH }}
           sudo chmod -R 755 ${{ secrets.VM_PATH }}
+          
+          echo "Deployment completed successfully!"
