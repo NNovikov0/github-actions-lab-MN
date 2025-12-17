@@ -1,9 +1,9 @@
 <?php
 // Database configuration - use environment variables from GitHub Secrets
-$host = getenv('DB_HOST') ?: '136.114.93.122';
-$dbname = getenv('DB_NAME') ?: '88327';  
-$username = getenv('DB_USER') ?: 'stud';
-$password = getenv('DB_PASSWORD') ?: 'Uwb123!!';
+$host = $_SERVER['DB_HOST'] ?? '136.114.93.122';
+$dbname = $_SERVER['DB_NAME'] ?? '88327';
+$username = $_SERVER['DB_USER'] ?? 'stud';
+$password = $_SERVER['DB_PASSWORD'] ?? 'Uwb123!!';
 
 if (!$password) {
     die("Database password not configured. Please set DB_PASSWORD environment variable.");
