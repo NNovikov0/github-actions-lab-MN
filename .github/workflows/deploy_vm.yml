@@ -1,49 +1,25 @@
-name: Deploy PHP app to VM
+name: Deploy to EC2
 
 on:
   push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
+    branches: [ commit-branch ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      
-      - name: Add VM to known hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
-      
-      - name: Deploy application via rsync
-        env:
-          VM_HOST: ${{ secrets.VM_HOST }}
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_PATH: ${{ secrets.VM_PATH }}
-        run: |
-          rsync -avz --delete \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='gcp_vm_key' \
-            --exclude='deploy_app.sh' \
-            ./ $VM_USER@$VM_HOST:$VM_PATH/
-          
-          echo "Deployment completed successfully!"
-      
-      - name: Verify deployment
-        env:
-          VM_HOST: ${{ secrets.VM_HOST }}
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_PATH: ${{ secrets.VM_PATH }}
-        run: |
-          ssh $VM_USER@$VM_HOST "ls -la $VM_PATH"
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ${{ secrets.VM_PATH }}
+          git pull origin main || git clone https://github.com/NNovikov0/ https://github.com/NNovikov0/github-actions-lab-MN.git .
+          sudo chown -R ubuntu:www-data ${{ secrets.VM_PATH }}
+          sudo chmod -R 755 ${{ secrets.VM_PATH }}
