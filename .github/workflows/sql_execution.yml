@@ -1,0 +1,31 @@
+name: Run SQL migrations
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    paths:
+      - 'sql/**'  # Trigger on SQL file changes
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+      
+      - name: Run SQL migrations
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          for sql_file in sql/*.sql; do
+            echo "Executing $sql_file..."
+            mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" < "$sql_file"
+          done
+          echo "All migrations completed successfully!"
