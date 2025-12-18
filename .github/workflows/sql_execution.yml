@@ -26,9 +26,18 @@ jobs:
         run: |
           set -euo pipefail
           
+          # Create MySQL config file to avoid password warning
+          cat > ~/.my.cnf << EOF
+          [client]
+          user=${DB_USER}
+          password=${DB_PASSWORD}
+          host=${DB_HOST}
+          EOF
+          chmod 600 ~/.my.cnf
+          
           for sql_file in sql/*.sql; do
             echo "Executing $sql_file..."
-            mysql --host="$DB_HOST" --user="$DB_USER" --password="$DB_PASSWORD" "$DB_NAME" < "$sql_file"
+            mysql --defaults-file=~/.my.cnf --protocol=TCP "$DB_NAME" < "$sql_file"
           done
           
           echo "All migrations completed successfully!"

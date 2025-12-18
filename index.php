@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 // ================================
 // Database configuration
 // ================================
-$host     = getenv('DB_HOST') ?: 'localhost';
+$host     = getenv('DB_HOST') ?: '16.171.233.254';
 $dbname   = getenv('DB_NAME') ?: '88327';
 $username = getenv('DB_USER') ?: 'app_user';
 $password = getenv('DB_PASSWORD') ?: 'Uwb123!!';
