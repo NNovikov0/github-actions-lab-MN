@@ -30,3 +30,5 @@ jobs:
             mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" < "$sql_file"
           done
           echo "All migrations completed successfully!"
+
+#This is a test comment
